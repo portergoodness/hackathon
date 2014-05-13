@@ -4,10 +4,10 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /test                       controllers.Application.test
-GET		/stuff						controllers.Services.getNames
-POST	/stuff/:name				controllers.Services.setName(name)
-GET		/stuff/:id					controllers.Services.getName(id)
+GET     /hackathon                  controllers.Application.hackathon
+GET		/stuff						controllers.Services.getReducedEvents
+GET		/stuff/test					controllers.Services.getTestReducedEvents
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

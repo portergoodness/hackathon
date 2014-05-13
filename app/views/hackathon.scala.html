@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html ng-app="ngAppHackathon">
+<head>
+<title>Test View</title>
+<script type="text/javascript" src="assets/javascripts/angular-1.2.16/angular.js"></script>
+
+<script type="text/javascript" src="assets/javascripts/hackathon.js"></script>
+
+</head>
+
+<body ng-controller="ngAppHackathonController">
+
+<h1>Viewing Reduced Events</h1>
+
+<button ng-click="getReducedEvents()">Get Events</button>
+
+<table>
+	<thead>
+	<tr>
+		<th>Date</th>
+		<th>Source</th>
+		<th>Target</th>
+		<th>CAMEOCode</th>
+	</tr>
+	</thead>
+	<tbody ng-repeat="event in reducedEvents">
+	
+		<tr>
+			<td>{{event.Date}}</td>
+			<td>{{event.Source}}</td>
+			<td>{{event.Target}}</td>
+			<td>{{event.CAMEOCode}}</td>
+		</tr>
+	</tbody>
+</table>
+</body>
+
+</html>

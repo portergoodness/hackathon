@@ -18,7 +18,16 @@ object CDF {
   
   // Get the information model URIs as (name, uri) pairs
   def infoModelUris()(implicit ec: ExecutionContext): Future[Seq[(String, String)]] = 
-    WS.url(base + "services-web/cdf/metadata").get map { resp =>
+    WS.url(base + "/services-web/cdf/metadata").get map { resp =>
+      for {
+        JsArray(infoModels) <- resp.json \\ "informationModels"
+        JsObject(fields) <- infoModels
+        (name, infoModel) <- fields
+      } yield (name, (infoModel \ "uri").as[String])
+    }
+  
+  def allReducedEventsQuerySpec(page: Int, pageSize: Int)(implicit ec: ExecutionContext): Future[Seq[(String, String)]] = 
+    WS.url(base + "/services-web/cdf/data/GDELT/Reduced_Events_all_QuerySpec").get map { resp =>
       for {
         JsArray(infoModels) <- resp.json \\ "informationModels"
         JsObject(fields) <- infoModels

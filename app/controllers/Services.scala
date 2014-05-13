@@ -3,36 +3,26 @@ package controllers
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
-
-
-import namestore._
+import hackathon.{CDF, TestReducedEvents}
+import play.api.libs.concurrent.Execution.Implicits._
 
 
 object Services extends Controller {
   
-  def getNames = Action {
-    
-    Ok(Json.toJson(NameStore.all))
-  }
-  
-  def getName(id: String) = Action {
-    NameStore.byId(id) match {
-      case Some(name) => Ok(name)
-      case None		  => NotFound("ID not found")	
+  def getReducedEvents = Action {
+    val promiseOfStuff = CDF.infoModelUris()
+    Async {
+      promiseOfStuff.map(f => {
+        Ok(Json.toJson(f.toMap))
+      })
+      
     }
-  }
-  
-  def setName(name: String) = Action { 
     
-	  Ok(NameStore.addName(name))
   }
   
-  def deleteName(id: String) = Action {
-	  if (NameStore.deleteName(id)) {
-	    Ok("")
-	  } else {
-		NotFound("Item with id "+id+" was not found")
-	  }
+  // returns test data
+  def getTestReducedEvents = Action {
+    Ok(TestReducedEvents.testData)
   }
   
 }
