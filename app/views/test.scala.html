@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="ngAppDemo">
 <head>
 <title>Test View</title>
+<script type="text/javascript" src="assets/javascripts/angular-1.2.16/angular.js"></script>
+
+<script type="text/javascript" src="assets/javascripts/test.js"></script>
+
 </head>
 
 <body>
+<div ng-controller="ngAppDemoController">
+	<p>I can add: {{a}} + {{b}} = {{a+b}}</p>
+</div>
 <h1>This is a test page</h1>
 </body>
 

@@ -8,3 +8,12 @@ Thumbs.db
 
 /target
 /logs
+
+.target/
+.project/
+.target/
+.worksheet/
+.cache
+.classpath
+.project
+.settings/
