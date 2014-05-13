@@ -6,14 +6,28 @@
 ehthumbs.db
 Thumbs.db
 
-/target
-/logs
-
-.target/
-.project/
-.target/
-.worksheet/
 .cache
 .classpath
+
+*.class
+*.log
+
+# sbt specific
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/project
+
+# Scala-IDE specific
+.scala_dependencies
+.settings
+.classpath
 .project
-.settings/
+.cache
+.worksheet/
+*.sc
+.target/
+>>>>>>> d187ef2a752d484da4a7a668570c2b5ac3dc696b
