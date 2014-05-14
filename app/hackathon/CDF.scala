@@ -27,7 +27,7 @@ object CDF {
     }
   
   def allReducedEventsQuerySpec(start: Int, rows: Int)(implicit ec: ExecutionContext): Future[JsValue] = 
-    WS.url(base + "/services-web/cdf/data/GDELT/Reduced_Events_all_QuerySpec?$start="+start+"&$rows="+rows).get map (_.json)
+    WS.url(base + "data/GDELT/Reduced_Events_all_QuerySpec?$start="+start+"&$rows="+rows).get map (_.json)
   
   def instances(urls: Seq[String])(implicit ec: ExecutionContext) = {
     val len = (base + "data/").length
