@@ -25,4 +25,15 @@ object Services extends Controller {
     Ok(TestReducedEvents.testData)
   }
   
+  // Take a set of +/- 
+  def classify = Action { req =>
+    val posNegs = for {
+      json <- req.body.asJson.toSeq
+      JsArray(pos) <- json \\ "positives"
+      JsArray(neg) <- json \\ "negatives"
+    } yield (pos.map(_.as[String]), neg.map(_.as[String]))
+    
+    Ok("hey")
+  }
+  
 }
