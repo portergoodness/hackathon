@@ -9,10 +9,21 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 object Services extends Controller {
   
-  def getReducedEvents = Action {
-    val promiseOfStuff = CDF.infoModelUris()
+  def getReducedEvents(start: Int, rows: Int) = Action {
+    val promiseOfEvents = CDF.allReducedEventsQuerySpec(start, rows)
     Async {
-      promiseOfStuff.map(f => {
+      promiseOfEvents.map(f => {
+        Ok(Json.toJson(f))
+      })
+      
+    }
+    
+  }
+  
+  def getMetadata = Action {
+    val promiseOfMetadata = CDF.infoModelUris()
+    Async {
+      promiseOfMetadata.map(f => {
         Ok(Json.toJson(f.toMap))
       })
       

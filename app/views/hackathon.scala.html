@@ -21,6 +21,12 @@
 		<th>Source</th>
 		<th>Target</th>
 		<th>CAMEOCode</th>
+		<th>Number of Events</th>
+		<th>Number of Articles</th>
+		<th>Quad Class</th>
+		<th>Goldstein</th>
+		<th>Positive</th>
+		<th>Negative</th>
 	</tr>
 	</thead>
 	<tbody ng-repeat="event in reducedEvents">
@@ -30,9 +36,18 @@
 			<td>{{event.Source}}</td>
 			<td>{{event.Target}}</td>
 			<td>{{event.CAMEOCode}}</td>
+			<td>{{event.NumEvents}}</td>
+			<td>{{event.NumArts}}</td>
+			<td>{{event.QuadClass}}</td>
+			<td>{{event.Goldstein}}</td>
+			<td><input type="checkbox" ng-checked="isPositiveEvent(event)" ng-click="addPositiveEvent(event)"/></td>
+			<td><input type="checkbox" ng-checked="isNegativeEvent(event)" ng-click="addNegativeEvent(event)"/></td>
 		</tr>
 	</tbody>
 </table>
+
+<button ng-click="transmitTrainingSet()">Transmit Training Set</button>
+	
 </body>
 
 </html>
