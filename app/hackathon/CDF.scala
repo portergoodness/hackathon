@@ -23,15 +23,10 @@ object CDF {
         JsArray(infoModels) <- resp.json \\ "informationModels"
         JsObject(fields) <- infoModels
         (name, infoModel) <- fields
-      } yield (name, (infoModel \ "uri").as[String])
+      } yield (name, (infoModel \ "url").as[String])
     }
   
-  def allReducedEventsQuerySpec(page: Int, pageSize: Int)(implicit ec: ExecutionContext): Future[Seq[(String, String)]] = 
-    WS.url(base + "/services-web/cdf/data/GDELT/Reduced_Events_all_QuerySpec").get map { resp =>
-      for {
-        JsArray(infoModels) <- resp.json \\ "informationModels"
-        JsObject(fields) <- infoModels
-        (name, infoModel) <- fields
-      } yield (name, (infoModel \ "uri").as[String])
-    }
+  def allReducedEventsQuerySpec(start: Int, rows: Int)(implicit ec: ExecutionContext): Future[JsValue] = 
+    WS.url(base + "/services-web/cdf/data/GDELT/Reduced_Events_all_QuerySpec?$start="+start+"&$rows="+rows).get map (_.json)
+    
 }
