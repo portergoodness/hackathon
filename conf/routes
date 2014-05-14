@@ -7,7 +7,7 @@ GET     /                           controllers.Application.index
 GET     /hackathon                  controllers.Application.hackathon
 GET		/stuff						controllers.Services.getReducedEvents(start: Int ?= 1, rows: Int ?=10)
 GET		/stuff/test					controllers.Services.getTestReducedEvents
-POST	/trainingSet				controllers.Services.receiveTrainingSetUrls
+POST	/trainingSet				controllers.Services.classify
 
 
 # Map static resources from the /public folder to the /assets URL path
