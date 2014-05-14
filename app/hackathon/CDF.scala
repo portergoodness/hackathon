@@ -14,11 +14,11 @@ object CDF {
     case _ => new Configuration(ConfigFactory.load())
   }
   
-  lazy val base = config.getString("cdf.url")
+  lazy val base = config.getString("cdf.url") + "/services-web/cdf/"
   
   // Get the information model URIs as (name, uri) pairs
   def infoModelUris()(implicit ec: ExecutionContext): Future[Seq[(String, String)]] = 
-    WS.url(base + "/services-web/cdf/metadata").get map { resp =>
+    WS.url(base + "metadata").get map { resp =>
       for {
         JsArray(infoModels) <- resp.json \\ "informationModels"
         JsObject(fields) <- infoModels
@@ -27,6 +27,28 @@ object CDF {
     }
   
   def allReducedEventsQuerySpec(start: Int, rows: Int)(implicit ec: ExecutionContext): Future[JsValue] = 
-    WS.url(base + "/services-web/cdf/data/GDELT/Reduced_Events_all_QuerySpec?$start="+start+"&$rows="+rows).get map (_.json)
+    WS.url(base + "data/GDELT/Reduced_Events_all_QuerySpec?$start="+start+"&$rows="+rows).get map (_.json)
+  
+  def instances(urls: Seq[String])(implicit ec: ExecutionContext) = {
+    val len = (base + "data/").length
+    val resourceObjs = urls map { url => 
+      JsObject(Seq("resource" -> JsString(url.substring(len)), "method" -> JsString("GET"))) 
+    }
+    val req = JsObject(Seq("keyed" -> JsArray(resourceObjs)))
     
+    WS.url(base + "data/$keyed").withHeaders("Content-Type" -> "application/json").post(req) map { resp =>
+      for {
+        obj <- resp.json \\ "response"
+      } yield (obj)
+    }
+  }
+  
+  def classDescription(classUrl: String)(implicit ec: ExecutionContext) = 
+    WS.url(classUrl + "?$expand=true").get map { resp =>
+      val attrTypes = for {
+        JsArray(attrs) <- resp.json \\ "attributes"
+        attr <- attrs
+      } yield ((attr \ "identifier").as[String], (attr \ "type").as[String])
+      
+    }
 }

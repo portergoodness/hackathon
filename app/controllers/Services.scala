@@ -44,7 +44,17 @@ object Services extends Controller {
       }
       case _ => BadRequest("Body not in Json")
     }
+  }
+  
+  // Take a set of +/- 
+  def classify = Action { req =>
+    val posNegs = for {
+      json <- req.body.asJson.toSeq
+      JsArray(pos) <- json \\ "positives"
+      JsArray(neg) <- json \\ "negatives"
+    } yield (pos.map(_.as[String]), neg.map(_.as[String]))
     
+    Ok("hey")
   }
   
 }
