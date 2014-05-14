@@ -36,4 +36,15 @@ object Services extends Controller {
     Ok(TestReducedEvents.testData)
   }
   
+  def receiveTrainingSetUrls = Action{ request =>
+    
+    request.body.asJson match {
+      case jsonBody: Some[JsObject] => {
+        Ok(Json.toJson(jsonBody))
+      }
+      case _ => BadRequest("Body not in Json")
+    }
+    
+  }
+  
 }

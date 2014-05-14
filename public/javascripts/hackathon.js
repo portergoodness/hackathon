@@ -43,6 +43,8 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 		}
 		
 		$scope.transmitTrainingSet = function() {
-			
+			{
+//				"positives": ["http://hackathon/cdf/a", "http://hackathon/cdf/b"],
+//				"negatives": [...
 		}
 }]);
