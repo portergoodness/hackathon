@@ -9,6 +9,8 @@ GET		/stuff						controllers.Services.getReducedEvents(start: Int ?= 1, rows: In
 GET		/stuff/test					controllers.Services.getTestReducedEvents
 POST	/trainingSet				controllers.Services.classify
 
+GET		/events						controllers.Services.getReducedEventsFromIds(ids: List[Long])
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

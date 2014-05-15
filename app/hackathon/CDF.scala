@@ -14,7 +14,9 @@ object CDF {
     case _ => new Configuration(ConfigFactory.load())
   }
   
+  lazy val hackathonUrl = config.getString("cdf.url")
   lazy val base = config.getString("cdf.url") + "/services-web/cdf/"
+  lazy val solrBase = config.getString("cdf.url") + "/cdf-apache-solr/"
   
   // Get the information model URIs as (name, uri) pairs
   def infoModelUris()(implicit ec: ExecutionContext): Future[Seq[(String, String)]] = 
@@ -28,6 +30,13 @@ object CDF {
   
   def allReducedEventsQuerySpec(start: Int, rows: Int)(implicit ec: ExecutionContext): Future[JsValue] = 
     WS.url(base + "data/GDELT/Reduced_Events_all_QuerySpec?$start="+start+"&$rows="+rows).get map (_.json)
+  
+  def reducedEventsQuerySpecByID(ids: List[Long])(implicit ec: ExecutionContext): Future[JsValue] =
+    WS.url(base + "data/GDELT/Reduced_Events_all_QuerySpec?$constraint=" + ids.mkString("Id%20Eq%20", "%20or%20Id%20Eq%20", "")).get map (_.json)
+  
+  def allReducedEventsQuerySpecSolr(start: Int, rows: Int)(implicit ec: ExecutionContext): Future[JsValue] = 
+    WS.url(hackathonUrl+"/cdf-apache-solr/select?q=*:*&wt=json&start="+start+"&rows="+rows).get map (_.json)
+  
   
   def instances(urls: Seq[String])(implicit ec: ExecutionContext) = {
     val len = (base + "data/").length
