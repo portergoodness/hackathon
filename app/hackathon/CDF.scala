@@ -15,8 +15,8 @@ object CDF {
   }
   
   lazy val hackathonUrl = config.getString("cdf.url")
-  lazy val base = config.getString("cdf.url") + "/services-web/cdf/"
-  lazy val solrBase = config.getString("cdf.url") + "/cdf-apache-solr/"
+  lazy val base = hackathonUrl + "/services-web/cdf/"
+  lazy val solrBase = hackathonUrl + "/cdf-apache-solr/"
   
   // Get the information model URIs as (name, uri) pairs
   def infoModelUris()(implicit ec: ExecutionContext): Future[Seq[(String, String)]] = 
@@ -43,7 +43,6 @@ object CDF {
     val startUrl = "start="+start
     val rowsUrl = "rows="+rows
     val solrUrl = urlBase + "?" + "q=" + query + "&" + startUrl + "&" + rowsUrl + "&wt=json"
-    System.out.println("Url is: "+solrUrl)
     WS.url(solrUrl).get map (_.json)
   }
   
