@@ -35,6 +35,7 @@ Search:<input ng-bind="searchField" type="text"/><button ng-click="getReducedEve
 		<th>Number of Articles</th>
 		<th>Quad Class</th>
 		<th>Goldstein</th>
+        <th>ID</th>
 		<th>Positive</th>
 		<th>Negative</th>
 	</tr>
@@ -50,11 +51,16 @@ Search:<input ng-bind="searchField" type="text"/><button ng-click="getReducedEve
 			<td>{{event.NumArts}}</td>
 			<td>{{event.QuadClass}}</td>
 			<td>{{event.Goldstein}}</td>
-			<td><input type="checkbox" ng-checked="isPositiveEvent(event)" ng-click="addPositiveEvent(event)"/></td>
-			<td><input type="checkbox" ng-checked="isNegativeEvent(event)" ng-click="addNegativeEvent(event)"/></td>
+            <td>{{event.Id}}</td>
+			<td><input type="checkbox" ng-checked="isPositiveEvent(event)" ng-click="makeEvent($event, event, true)"/></td>
+			<td><input type="checkbox" ng-checked="isNegativeEvent(event)" ng-click="makeEvent($event, event, false)"/></td>
 		</tr>
 	</tbody>
 </table>
+<ul class="pager">
+    <li><a href="#" ng-click="pageFunc(-1)" ng-hide="pageObj.position == 1">Previous</a></li>
+    <li><a href="#" ng-click="pageFunc(+1)" ng-hide="reducedEvents.length < 1">Next</a></li>
+</ul>
 
 <button ng-click="transmitTrainingSet()">Transmit Training Set</button>
 	
