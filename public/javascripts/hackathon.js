@@ -5,9 +5,16 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 		$scope.reducedEvents = [];
 		$scope.negativeEvents = {};
 		$scope.positiveEvents = {};
+        $scope.pageObj = {position: 1, size: 10};
 		
-		$scope.getReducedEvents = function() {
-			$http.get('stuff').success(function (data) {
+		$scope.getReducedEvents = function(elementNumber, pageSize) {
+            var url = "stuff";
+
+            if (angular.isDefined(elementNumber)) {
+                url += '?start='+elementNumber + '&rows=' + pageSize;
+            }
+
+			$http.get(url).success(function (data) {
 				
 				// this is the data from solr, it only has a limited amount of info
 				getPrimaryKey = function(doc) {
@@ -34,6 +41,14 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 				
 			})
 		}
+
+        $scope.pageFunc = function(pageDirection) {
+            if ($scope.pageObj.position + (pageDirection * $scope.pageObj.size)< 1 )
+                return;
+
+            $scope.pageObj.position+= (pageDirection * $scope.pageObj.size);
+            $scope.getReducedEvents($scope.pageObj.position, $scope.pageObj.size);
+        }
 		
 		$scope.isPositiveEvent = function(event) {
 			return angular.isDefined($scope.positiveEvents[event.Id]);
@@ -43,28 +58,25 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 			return angular.isDefined($scope.negativeEvents[event.Id]);
 		}
 		
-		$scope.addPositiveEvent = function(event) {
-			if ($scope.isNegativeEvent(event)) {
-				delete $scope.negativeEvents[event.Id];
-			}
-			if ($scope.isNegativeEvent(event)) {
-				delete $scope.positiveEvents[event.Id];
-			} else {
-				$scope.positiveEvents[event.Id] = event;
-			}
+		$scope.makeEvent = function(jsEvent, event, isPositive) {
+            if (!jsEvent.target.checked) {
+                delete $scope.negativeEvents[event.Id];
+                delete $scope.positiveEvents[event.Id];
+                return;
+            }
+
+
+            if (isPositive) {
+                delete $scope.negativeEvents[event.Id];
+                $scope.positiveEvents[event.Id] ="";
+            }
+			else {
+                delete $scope.positiveEvents[event.Id];
+                $scope.negativeEvents[event.Id] ="";
+            }
 		}
 		
-		$scope.addNegativeEvent = function(event) {
-			if ($scope.isPositiveEvent(event)) {
-				delete $scope.positiveEvents[event.Id];
-			}
-			if ($scope.isPositiveEvent(event)) {
-				delete $scope.negativeEvents[event.Id];
-			} else {
-				$scope.negativeEvents[event.Id] = event;
-			}
-		}
-		
+
 		$scope.transmitTrainingSet = function() {
 			
 //				"positives": ["http://hackathon/cdf/a", "http://hackathon/cdf/b"],
