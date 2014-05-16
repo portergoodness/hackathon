@@ -12,8 +12,13 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 		$scope.getReducedEvents = function(elementNumber, pageSize) {
             var url = "stuff";
 
+            var paramCombiner = '?';
             if (angular.isDefined(elementNumber)) {
                 url += '?start='+elementNumber + '&rows=' + pageSize;
+                paramCombiner = '&'
+            }
+            if ($scope.searchField !== "") {
+            	url += paramCombiner+'search='+encodeURIComponent($scope.searchField)
             }
 
 			$http.get(url).success(function (data) {
