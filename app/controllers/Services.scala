@@ -9,8 +9,9 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 object Services extends Controller {
   
-  def getReducedEvents(start: Int, rows: Int) = Action {
-    val promiseOfEvents = CDF.allReducedEventsQuerySpec(start, rows)
+  // lookup stuff from solr
+  def getReducedEvents(start: Int, rows: Int, search: Option[String]) = Action {
+    val promiseOfEvents = CDF.allReducedEventsQuerySpecSolr(start, rows, search)
     Async {
       promiseOfEvents.map(f => {
         Ok(Json.toJson(f))
@@ -35,6 +36,27 @@ object Services extends Controller {
   def getTestReducedEvents = Action {
     Ok(TestReducedEvents.testData)
   }
+  
+  // lookup CDF event data for the provided ids
+  def getReducedEventsFromIds(ids: List[Long]) = Action {
+    val promiseOfEvents = CDF.reducedEventsQuerySpecByID(ids)
+    Async {
+      promiseOfEvents.map(f => {
+        Ok(Json.toJson(f))
+      })
+    }
+    
+  }
+  
+//  def receiveTrainingSetUrls = Action{ request =>
+//    
+//    request.body.asJson match {
+//      case jsonBody: Some[JsObject] => {
+//        Ok(Json.toJson(jsonBody))
+//      }
+//      case _ => BadRequest("Body not in Json")
+//    }
+//  }
   
   // Take a set of +/- 
   def classify = Action { req =>
