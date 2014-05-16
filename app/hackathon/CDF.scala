@@ -34,8 +34,18 @@ object CDF {
   def reducedEventsQuerySpecByID(ids: List[Long])(implicit ec: ExecutionContext): Future[JsValue] =
     WS.url(base + "data/GDELT/Reduced_Events_all_QuerySpec?$constraint=" + ids.mkString("Id%20Eq%20", "%20or%20Id%20Eq%20", "")).get map (_.json)
   
-  def allReducedEventsQuerySpecSolr(start: Int, rows: Int)(implicit ec: ExecutionContext): Future[JsValue] = 
-    WS.url(hackathonUrl+"/cdf-apache-solr/select?q=*:*&wt=json&start="+start+"&rows="+rows).get map (_.json)
+  def allReducedEventsQuerySpecSolr(start: Int, rows: Int, search: Option[String])(implicit ec: ExecutionContext): Future[JsValue] = {
+    val urlBase = hackathonUrl+"/cdf-apache-solr/select"
+    val query = search match {
+      case Some(searchText: String) => "SearchField%3A"+searchText
+      case None 					=> "*%3A*"
+    }
+    val startUrl = "start="+start
+    val rowsUrl = "rows="+rows
+    val solrUrl = urlBase + "?" + "q=" + query + "&" + startUrl + "&" + rowsUrl + "&wt=json"
+    System.out.println("Url is: "+solrUrl)
+    WS.url(solrUrl).get map (_.json)
+  }
   
   
   def instances(urls: Seq[String])(implicit ec: ExecutionContext) = {

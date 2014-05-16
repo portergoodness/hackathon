@@ -22,8 +22,7 @@
 <body ng-controller="ngAppHackathonController" class="container">
 
 <h1>Viewing Reduced Events</h1>
-
-<button ng-click="getReducedEvents()">Get Events</button>
+Search:<input ng-bind="searchField" type="text"/><button ng-click="getReducedEvents()">Get Events</button>
 
 <table class="table">
 	<thead>

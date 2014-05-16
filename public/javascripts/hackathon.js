@@ -1,6 +1,8 @@
 var angularModule = angular.module('ngAppHackathon', []);
 angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 	function($scope, $http) {
+	
+		$scope.searchField = "";
 		
 		$scope.reducedEvents = [];
 		$scope.negativeEvents = {};

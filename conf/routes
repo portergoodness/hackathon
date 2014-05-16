@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /hackathon                  controllers.Application.hackathon
-GET		/stuff						controllers.Services.getReducedEvents(start: Int ?= 1, rows: Int ?=10)
+GET		/stuff						controllers.Services.getReducedEvents(start: Int ?= 1, rows: Int ?=10, search: Option[String])
 GET		/stuff/test					controllers.Services.getTestReducedEvents
 POST	/trainingSet				controllers.Services.classify
 

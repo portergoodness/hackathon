@@ -10,8 +10,8 @@ import play.api.libs.concurrent.Execution.Implicits._
 object Services extends Controller {
   
   // lookup stuff from solr
-  def getReducedEvents(start: Int, rows: Int) = Action {
-    val promiseOfEvents = CDF.allReducedEventsQuerySpecSolr(start, rows)
+  def getReducedEvents(start: Int, rows: Int, search: Option[String]) = Action {
+    val promiseOfEvents = CDF.allReducedEventsQuerySpecSolr(start, rows, search)
     Async {
       promiseOfEvents.map(f => {
         Ok(Json.toJson(f))
