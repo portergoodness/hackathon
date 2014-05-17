@@ -1,12 +1,11 @@
-var angularModule = angular.module('ngAppHackathon', []);
+var angularModule = angular.module('ngAppHackathon', ['ui.bootstrap']);
 angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 	function($scope, $http) {
 	
 		$scope.searchField = "";
 		
 		$scope.reducedEvents = [];
-		$scope.negativeEvents = {};
-		$scope.positiveEvents = {};
+		$scope.trainingSetEvents = {};
         $scope.pageObj = {position: 1, size: 10};
 		
 		$scope.getReducedEvents = function(elementNumber, pageSize) {
@@ -58,35 +57,33 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
         }
 		
 		$scope.isPositiveEvent = function(event) {
-			return angular.isDefined($scope.positiveEvents[event.Id]);
+			return angular.isDefined($scope.trainingSetEvents[event.Id]) && $scope.trainingSetEvents[event.Id].positive;
 		}
 		
 		$scope.isNegativeEvent = function(event) {
-			return angular.isDefined($scope.negativeEvents[event.Id]);
+			return angular.isDefined($scope.trainingSetEvents[event.Id]) && !$scope.trainingSetEvents[event.Id].positive;
 		}
 		
 		$scope.makeEvent = function(jsEvent, event, isPositive) {
             if (!jsEvent.target.checked) {
-                delete $scope.negativeEvents[event.Id];
-                delete $scope.positiveEvents[event.Id];
+                delete $scope.trainingSetEvents[event.Id];
                 return;
             }
 
-
             if (isPositive) {
-                delete $scope.negativeEvents[event.Id];
-                $scope.positiveEvents[event.Id] ="";
+                event.positive = true;
             }
 			else {
-                delete $scope.positiveEvents[event.Id];
-                $scope.negativeEvents[event.Id] ="";
+                event.positive = false;
             }
+            $scope.trainingSetEvents[event.Id] = event;
 		}
-		
 
 		$scope.transmitTrainingSet = function() {
 			
 //				"positives": ["http://hackathon/cdf/a", "http://hackathon/cdf/b"],
 //				"negatives": [...
 		}
+		
+		
 }]);
