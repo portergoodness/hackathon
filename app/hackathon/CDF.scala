@@ -41,7 +41,7 @@ object CDF {
       "?$constraint=" + ids.mkString("Id%20In%20(", "%2C", ")")
     }
     val requestUrl = base + "data/GDELT/Reduced_Events_all_QuerySpec" + constraintsUrl
-    println(requestUrl)
+    println("CDF Query: "+requestUrl)
     WS.url(requestUrl).get map (_.json)
   }
   
@@ -54,6 +54,7 @@ object CDF {
     val startUrl = "start="+start
     val rowsUrl = "rows="+rows
     val solrUrl = urlBase + "?" + "q=" + query + "&" + startUrl + "&" + rowsUrl + "&wt=json"
+    println("Solr Query: "+solrUrl)
     WS.url(solrUrl).get map (_.json)
   }
   

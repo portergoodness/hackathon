@@ -2,7 +2,7 @@ var angularModule = angular.module('ngAppHackathon', ['ui.bootstrap']);
 angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 	function($scope, $http) {
 	
-		$scope.searchField = "";
+		$scope.searchField = {value: ""};
 		
 		$scope.reducedEvents = [];
 		$scope.trainingSetEvents = {};
@@ -16,8 +16,8 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
                 url += '?start='+elementNumber + '&rows=' + pageSize;
                 paramCombiner = '&'
             }
-            if ($scope.searchField !== "") {
-            	url += paramCombiner+'search='+encodeURIComponent($scope.searchField)
+            if ($scope.searchField.value !== "") {
+            	url += paramCombiner+'search='+encodeURIComponent($scope.searchField.value)
             }
 
 			$http.get(url).success(function (data) {
