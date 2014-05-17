@@ -105,8 +105,8 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 			});
 			
 			if (angular.isUndefined(undefinedIfSuccessful)) {
-				$http.post('trainingSet', data).success(function() {
-					alert('Training Set Sent');
+				$http.post('trainingSet', data).success(function(resp) {
+					alert('Learned:\n' + resp);
 				});
 			} else {
 				alert("CDF has not returned data yet, cannot transmit training set");

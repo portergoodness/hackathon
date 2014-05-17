@@ -4,6 +4,7 @@ import weka.core.{ Attribute, FastVector, Instances, Instance, Range }
 import weka.filters.unsupervised.attribute.StringToNominal
 import weka.filters.Filter
 import play.api.libs.json._
+import org.joda.time.format.ISODateTimeFormat
 
 object Weka {
   
@@ -19,7 +20,7 @@ object Weka {
   
   private val nullVec: FastVector = null
   
-  private val dateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ"
+  private val dateTimeFmt = ISODateTimeFormat.dateTime()
   
   /** Get the weka format (instance container) based on a set of CDF attribute name/type pairs */
   def instanceContainer(attrNameTypePairs: Seq[(String, String)]): CDFInstances = {
@@ -64,7 +65,7 @@ object Weka {
     }
   }
   
-  /** Turn and string attributes into nominal values */
+  /** Turn any string attributes into nominal values */
   def makeNominals(instances: Instances): Instances = {
     // Find the indices that are string attrs
     val indices = Array.tabulate(instances.numAttributes())(i => i) filter { idx =>
@@ -108,7 +109,7 @@ object Weka {
       (value, wType) match {
         case (JsNumber(n), WekaNumeric) => (attr.index(), n.toDouble)
         case (JsString(s), WekaString) => (attr.index(), attr.addStringValue(s).toDouble)
-        case (JsString(s), WekaDate) => (attr.index(), attr.parseDate(s))
+        case (JsString(s), WekaDate) => (attr.index(), dateTimeFmt.parseDateTime(s).getMillis())
         case (JsBoolean(b), WekaNominal) => (attr.index(), boolNominal.indexOf(b.toString))
         case _ => null // no conversion
       }  
@@ -122,7 +123,7 @@ object Weka {
     wekaAttrTypes(cdfAttr) map {
       case (name, WekaNumeric) => new Attribute(name)
       case (name, WekaString) =>  new Attribute(name, nullVec)
-      case (name, WekaDate) =>    new Attribute(name, dateFormat)
+      case (name, WekaDate) =>    new Attribute(name)
       case (name, WekaNominal) if (cdfAttr._2 == CDFBoolean) => new Attribute(name, boolNominal)
       case _ => ???
     }
@@ -141,9 +142,9 @@ object Weka {
     case (name, CDFBoolean) =>    Seq((name + ":BOOLEAN", WekaNominal))
     case (name, CDFCoordinate) => Seq((name + ":COORDINATE:Lat", WekaNumeric), 
                                       (name + ":COORDINATE:Lon", WekaNumeric))
-    case (name, CDFDate) =>       Seq((name + ":DATE", WekaDate))
-    case (name, CDFDateRange) =>  Seq((name + ":DATERANGE:Start", WekaDate),
-                                      (name + ":DATERANGE:End", WekaDate))
+    case (name, CDFDate) =>       Seq((name + ":DATE", WekaNumeric))
+    case (name, CDFDateRange) =>  Seq((name + ":DATERANGE:Start", WekaNumeric),
+                                      (name + ":DATERANGE:End", WekaNumeric))
     case (name, CDFDoubleUnit) => Seq((name + ":DOUBLEUNIT:Value", WekaNumeric), 
                                       (name + ":DOUBLEUNIT:Units", WekaString))
     case _ =>                     Nil // don't currently handle

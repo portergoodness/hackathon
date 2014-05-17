@@ -3,8 +3,11 @@ package controllers
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
-import hackathon.{CDF, TestReducedEvents}
+import hackathon.{ CDF, TestReducedEvents, Weka }
 import play.api.libs.concurrent.Execution.Implicits._
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import weka.classifiers.trees.SimpleCart
 
 
 object Services extends Controller {
@@ -34,13 +37,41 @@ object Services extends Controller {
   
   // Take a set of +/- 
   def classify = Action { req =>
-    val posNegs = for {
+    
+    // Get the +/- instances from CDF
+    val pnUris = for {
       json <- req.body.asJson.toSeq
       JsArray(pos) <- json \\ "positives"
       JsArray(neg) <- json \\ "negatives"
-    } yield (pos.map(_.as[String]), neg.map(_.as[String]))
+      posInsts = CDF.instances(pos.map(_.as[String]))
+      negInsts = CDF.instances(neg.map(_.as[String]))
+    } yield (Await.result(posInsts, 20 seconds), Await.result(negInsts, 20 seconds))
     
-    Ok("hey")
+    // Fold them into a single tuple
+    val pnInsts = pnUris.foldLeft((Seq[JsValue](), Seq[JsValue]())) { 
+      case((accPs, accNs), (ps, ns)) => (accPs ++ ps, accNs ++ ns)
+    }
+    
+    // We assume all instances have the same CDF class/structure, so grab
+    // the first pos or neg and get the class description as (attr, type) tuples
+    val inst = pnInsts._1.headOption.getOrElse(pnInsts._2.head)
+    val cls = (inst \ "__information" \ "classUrl").as[String]
+    val clsDesc = CDF.classDescription(cls)
+    
+    val constraints = clsDesc map { attrs => 
+      val wekaCont = Weka.instanceContainer(attrs)
+      pnInsts._1 foreach { p => /*println("+ " + Json.stringify(p));*/ Weka.add(p, wekaCont, true) }
+      pnInsts._2 foreach { n => /*println("- " + Json.stringify(n));*/ Weka.add(n, wekaCont, false) }
+      
+      // Convert all string values to nominal for the CART classifier
+      val classifier = new SimpleCart()
+      classifier.buildClassifier(Weka.makeNominals(wekaCont.instances))
+      classifier.toString()
+    }
+    
+    Async {
+      constraints map { Ok(_) }
+    }
   }
   
 }

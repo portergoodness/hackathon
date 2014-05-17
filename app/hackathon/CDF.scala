@@ -59,7 +59,7 @@ object CDF {
   }
   
   
-  def instances(urls: Seq[String])(implicit ec: ExecutionContext) = {
+  def instances(urls: Seq[String])(implicit ec: ExecutionContext): Future[Seq[JsValue]] = {
     val len = (base + "data/").length
     val resourceObjs = urls map { url => 
       JsObject(Seq("resource" -> JsString(url.substring(len)), "method" -> JsString("GET"))) 
@@ -68,17 +68,17 @@ object CDF {
     
     WS.url(base + "data/$keyed").withHeaders("Content-Type" -> "application/json").post(req) map { resp =>
       for {
-        obj <- resp.json \\ "response"
+        obj <- resp.json \ "keyed" \\ "response"
       } yield (obj)
     }
   }
   
-  def classDescription(classUrl: String)(implicit ec: ExecutionContext) = 
+  def classDescription(classUrl: String)(implicit ec: ExecutionContext): Future[Seq[(String, String)]] =
     WS.url(classUrl + "?$expand=true").get map { resp =>
-      val attrTypes = for {
+      for {
         JsArray(attrs) <- resp.json \\ "attributes"
         attr <- attrs
       } yield ((attr \ "identifier").as[String], (attr \ "type").as[String])
-      
     }
+  
 }
