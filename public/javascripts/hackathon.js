@@ -17,7 +17,9 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
                 paramCombiner = '&'
             }
             if ($scope.searchField.value !== "") {
-            	url += paramCombiner+'search='+encodeURIComponent($scope.searchField.value)
+            	var searchFieldText = $scope.searchField.value.replace(" ","%20");
+            	
+            	url += paramCombiner+'search='+encodeURIComponent("("+$scope.searchField.value+")")
             }
 
 			$http.get(url).success(function (data) {

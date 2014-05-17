@@ -48,7 +48,7 @@ object CDF {
   def allReducedEventsQuerySpecSolr(start: Int, rows: Int, search: Option[String])(implicit ec: ExecutionContext): Future[JsValue] = {
     val urlBase = hackathonUrl+"/cdf-apache-solr/select"
     val query = search match {
-      case Some(searchText: String) => "SearchField%3A"+searchText
+      case Some(searchText: String) => "SearchField%3A"+searchText.replaceAll(" ", "%20")
       case None 					=> "*%3A*"
     }
     val startUrl = "start="+start
