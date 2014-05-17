@@ -81,8 +81,35 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 
 		$scope.transmitTrainingSet = function() {
 			
-//				"positives": ["http://hackathon/cdf/a", "http://hackathon/cdf/b"],
-//				"negatives": [...
+			if ($scope.trainingSetEvents.length === 0) return;
+			
+			var data = {
+					positives: [],
+					negatives: []
+			};
+			
+			// We use find here so we can break out of the loop if we find CDF hasn't loaded data yet
+			// undefined means we had no problems building data object, ie, find never received a true condition
+			var undefinedIfSuccessful = _.find($scope.trainingSetEvents, function(event) {
+				if (angular.isUndefined(event.__information)) {
+					return true;
+				}
+				if (event.positive) {
+					data.positives.push(event.__information.url);
+				} else {
+					data.negatives.push(event.__information.url);
+				}
+				return false;
+			});
+			
+			if (angular.isUndefined(undefinedIfSuccessful)) {
+				$http.post('trainingSet', data).success(function() {
+					alert('Training Set Sent');
+				});
+			} else {
+				alert("CDF has not returned data yet, cannot transmit training set");
+			}
+			
 		}
 		
 		
