@@ -60,8 +60,8 @@ object Services extends Controller {
     
     val constraints = clsDesc map { attrs => 
       val wekaCont = Weka.instanceContainer(attrs)
-      pnInsts._1 foreach { p => /*println("+ " + Json.stringify(p));*/ Weka.add(p, wekaCont, true) }
-      pnInsts._2 foreach { n => /*println("- " + Json.stringify(n));*/ Weka.add(n, wekaCont, false) }
+      pnInsts._1 foreach { p => Weka.add(p, wekaCont, true) }
+      pnInsts._2 foreach { n => Weka.add(n, wekaCont, false) }
       
       // Convert all string values to nominal for the CART classifier
       val classifier = new SimpleCart()

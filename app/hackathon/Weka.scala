@@ -26,8 +26,11 @@ object Weka {
   def instanceContainer(attrNameTypePairs: Seq[(String, String)]): CDFInstances = {
     val pairs = attrNameTypePairs map { p => (p._1, cdfType(p._2)) }
     
+    // Filter out the "Id", we don't want to learn it
+    val filtPairs = pairs filter { _._1 != "Id" }
+    
     // Fold the attribute name / type pairs into a weka vector
-    val attrs = pairs.foldLeft(new FastVector()) { (vec, p) =>
+    val attrs = filtPairs.foldLeft(new FastVector()) { (vec, p) =>
       wekaAttrs(p) foreach { vec.addElement(_) }
       vec
     }
@@ -39,7 +42,7 @@ object Weka {
     val instances = new Instances("cdf", attrs, 0)
     instances.setClass(cls)
     
-    CDFInstances(pairs.toMap, instances)
+    CDFInstances(filtPairs.toMap, instances)
   }
   
   /** Add a CDF data instance to the container */
@@ -48,9 +51,12 @@ object Weka {
       case JsObject(attrValues) => {
         val instData = Array.fill(inst.instances.numAttributes())(0.0)
         
+        // Filter out the id attr
+        val filtAttrs = attrValues filter { _._1 != "Id" }
+        
         // Map/add the attribute values
         for {
-          attrVal <- attrValues 
+          attrVal <- filtAttrs 
           (idx, wekaVal) <- wekaValues(attrVal, inst)
         } instData(idx) = wekaVal
         
@@ -142,9 +148,9 @@ object Weka {
     case (name, CDFBoolean) =>    Seq((name + ":BOOLEAN", WekaNominal))
     case (name, CDFCoordinate) => Seq((name + ":COORDINATE:Lat", WekaNumeric), 
                                       (name + ":COORDINATE:Lon", WekaNumeric))
-    case (name, CDFDate) =>       Seq((name + ":DATE", WekaNumeric))
-    case (name, CDFDateRange) =>  Seq((name + ":DATERANGE:Start", WekaNumeric),
-                                      (name + ":DATERANGE:End", WekaNumeric))
+    case (name, CDFDate) =>       Seq((name + ":DATE", WekaDate))
+    case (name, CDFDateRange) =>  Seq((name + ":DATERANGE:Start", WekaDate),
+                                      (name + ":DATERANGE:End", WekaDate))
     case (name, CDFDoubleUnit) => Seq((name + ":DOUBLEUNIT:Value", WekaNumeric), 
                                       (name + ":DOUBLEUNIT:Units", WekaString))
     case _ =>                     Nil // don't currently handle
