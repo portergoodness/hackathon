@@ -1,8 +1,10 @@
-var angularModule = angular.module('ngAppHackathon', ['ui.bootstrap']);
+var angularModule = angular.module('ngAppHackathon', ['ui.bootstrap', 'google-maps']);
 angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 	function($scope, $http) {
-	
+
 		$scope.searchField = {value: ""};
+
+        $scope.resultsFound = -1;
 		
 		$scope.reducedEvents = [];
 		$scope.trainingSetEvents = {};
@@ -20,10 +22,17 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
             	var searchFieldText = $scope.searchField.value.replace(" ","%20");
             	
             	url += paramCombiner+'search='+encodeURIComponent("("+$scope.searchField.value+")")
+                paramCombiner = "&";
+            }
+
+            if (angular.isDefined($scope.searchField.distance) && $scope.searchField.distance !== "") {
+                url += paramCombiner+"fq=%7B!geofilt%20sfield=Location%7D&pt=" + $scope.searchField.lat + "," + $scope.searchField.long +
+                    "&d=" + $scope.searchField.distance;
             }
 
 			$http.get(url).success(function (data) {
-				
+
+                $scope.resultsFound = data.response.numFound;
 				// this is the data from solr, it only has a limited amount of info
 				getPrimaryKey = function(doc) {
 					return _.last(doc.PrimaryKey.split("/"));
