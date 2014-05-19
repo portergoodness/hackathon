@@ -8,6 +8,8 @@ class CDFConstraintClassifier extends SimpleCart2 {
   
   private val dateTimeFmt = ISODateTimeFormat.dateTime()
   
+  val worldBox = GeoBox(-180, 180, -90, 90)
+  
   def getConstraints(): String = {
     val dnfConstraints = for {
       conjClause <- dnf(Nil, this) if (conjClause.last == Pos)
@@ -15,7 +17,40 @@ class CDFConstraintClassifier extends SimpleCart2 {
     
     // This is kind of ugly
     val strConstraints: Seq[String] = dnfConstraints map { conjClause =>
-      val strClause = conjClause flatMap {
+      // Hack for geo constraints
+      val geoConstPart = conjClause partition {
+        case WekaConstraint(attr, _, _) => attr.split(":")(1) == "COORDINATE"
+        case _ => false
+      }
+      
+      // Fold geo constraints into a bounding box
+      val geoBox = geoConstPart._1.foldLeft(("", worldBox)) {
+        case ((aName, box), WekaConstraint(attr, op, Right(d))) => {
+          val attrTypeArr = attr.split(":")
+          val attrName = attrTypeArr(0)
+          if (attrTypeArr.length == 3) (op, attrTypeArr(2)) match {
+            case ("<", "Lat") => (attrName, box.copy(latMax = d))
+            case (">=", "Lat") => (attrName, box.copy(latMin = d))
+            case ("<", "Lon") => (attrName, box.copy(lonMax = d))
+            case (">=", "Lon") => (attrName, box.copy(lonMin = d))
+            case _ => (attrName, box)
+          }
+          else (attrName, box)
+        }
+        case (attrBox, _) => attrBox
+      }
+      
+      val geoClause: Seq[String] = if (geoBox._2 != worldBox) {
+        val attrName = geoBox._1
+        val box = geoBox._2
+        val points = Seq(box.lonMin + " " + box.latMin, box.lonMax + " " + box.latMin,
+                         box.lonMin + " " + box.latMax, box.lonMax + " " + box.latMax)
+        val polyStr = points.mkString("POLYGON(", ", ", ")")
+        Seq("Within(" + attrName + ", " + polyStr + ")")
+      }
+      else Nil
+      
+      val strClause = geoConstPart._2 flatMap {
         case WekaConstraint(attr, op, value) => {
           val attrTypeArr = attr.split(":")
           val valStr = (cdfType(attrTypeArr(1)), value) match {
@@ -29,7 +64,7 @@ class CDFConstraintClassifier extends SimpleCart2 {
         }
         case _ => Nil
       }
-      strClause.mkString("(", " and ", ")")
+      (strClause ++ geoClause).mkString("(", " and ", ")")
     }
     
     strConstraints.mkString(" or ")
@@ -87,6 +122,8 @@ class CDFConstraintClassifier extends SimpleCart2 {
     }
   }
 }
+
+case class GeoBox(lonMin: Double, lonMax: Double, latMin: Double, latMax: Double)
 
 sealed trait WekaTerm
 case class WekaConstraint(attr: String, op: String, value: Either[String, Double]) extends WekaTerm
