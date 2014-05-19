@@ -9,6 +9,8 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 		$scope.reducedEvents = [];
 		$scope.trainingSetEvents = {};
         $scope.pageObj = {position: 1, size: 10};
+        
+        $scope.learnedQuerySpecs = [];
 		
 		$scope.getReducedEvents = function(elementNumber, pageSize) {
             var url = "stuff";
@@ -115,7 +117,7 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
 			
 			if (angular.isUndefined(undefinedIfSuccessful)) {
 				$http.post('trainingSet', data).success(function(resp) {
-					alert('Learned:\n' + resp);
+					$scope.learnedQuerySpecs.push(resp);
 				});
 			} else {
 				alert("CDF has not returned data yet, cannot transmit training set");

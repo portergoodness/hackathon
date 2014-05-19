@@ -136,6 +136,22 @@
 	  </table>
       <button class="btn btn-primary" ng-click="transmitTrainingSet()">Transmit Training Set</button>
     </tab>
+    
+    <tab heading="Learned Query Specs">
+      <table class="table">
+		<thead>
+		<tr>
+			<th>Query Spec</th>
+		</tr>
+		</thead>
+		<tbody ng-repeat="spec in learnedQuerySpecs track by $index">
+		
+			<tr>
+				<td>{{spec}}</td>
+			</tr>
+		</tbody>
+	  </table>
+    </tab>
   </tabset>
 
   <hr />
