@@ -3,11 +3,10 @@ package controllers
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
-import hackathon.{ CDF, TestReducedEvents, Weka }
+import hackathon.{ CDF, CDFConstraintClassifier, TestReducedEvents, Weka }
 import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import weka.classifiers.trees.SimpleCart
 
 
 object Services extends Controller {
@@ -64,9 +63,10 @@ object Services extends Controller {
       pnInsts._2 foreach { n => Weka.add(n, wekaCont, false) }
       
       // Convert all string values to nominal for the CART classifier
-      val classifier = new SimpleCart()
+      val classifier = new CDFConstraintClassifier()
       classifier.buildClassifier(Weka.makeNominals(wekaCont.instances))
-      classifier.toString()
+      println(classifier.toString())
+      classifier.getConstraints()
     }
     
     Async {
