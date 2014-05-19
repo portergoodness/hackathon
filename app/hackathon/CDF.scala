@@ -45,15 +45,19 @@ object CDF {
     WS.url(requestUrl).get map (_.json)
   }
   
-  def allReducedEventsQuerySpecSolr(start: Int, rows: Int, search: Option[String])(implicit ec: ExecutionContext): Future[JsValue] = {
+  def allReducedEventsQuerySpecSolr(start: Int, rows: Int, search: Option[String], geoSearchParams: Option[(Float, Float, Float)])(implicit ec: ExecutionContext): Future[JsValue] = {
     val urlBase = hackathonUrl+"/cdf-apache-solr/select"
     val query = search match {
       case Some(searchText: String) => "SearchField%3A"+searchText.replaceAll(" ", "%20")
       case None 					=> "*%3A*"
     }
+    val geoParamsUrl = geoSearchParams match {
+      case Some(geoParams) => "fq=%7B!geofilt%20sfield=Location%7D&pt=" + geoParams._1 + "," + geoParams._2 + "&d=" + geoParams._3
+      case None			   => ""
+    }
     val startUrl = "start="+start
     val rowsUrl = "rows="+rows
-    val solrUrl = urlBase + "?" + "q=" + query + "&" + startUrl + "&" + rowsUrl + "&wt=json"
+    val solrUrl = urlBase + "?" + "q=" + query + "&" + startUrl + "&" + rowsUrl + "&" + geoParamsUrl + "&wt=json"
     println("Solr Query: "+solrUrl)
     WS.url(solrUrl).get map (_.json)
   }

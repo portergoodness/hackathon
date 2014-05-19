@@ -12,8 +12,13 @@ import scala.concurrent.duration._
 object Services extends Controller {
   
   // lookup stuff from solr
-  def searchForEvents(start: Int, rows: Int, search: Option[String]) = Action {
-    val promiseOfEvents = CDF.allReducedEventsQuerySpecSolr(start, rows, search)
+  def searchForEvents(start: Int, rows: Int, search: Option[String], lat: Option[Float], long: Option[Float], distance: Option[Float]) = Action {
+    val geoSearchParams = if (lat.isDefined && long.isDefined && distance.isDefined) {
+      Option((lat.get, long.get, distance.get))
+    } else {
+      None
+    }
+    val promiseOfEvents = CDF.allReducedEventsQuerySpecSolr(start, rows, search, geoSearchParams)
     Async {
       promiseOfEvents.map(f => {
         Ok(Json.toJson(f))

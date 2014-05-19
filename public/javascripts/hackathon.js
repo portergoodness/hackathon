@@ -28,9 +28,16 @@ angularModule.controller('ngAppHackathonController', ['$scope', '$http',
             }
 
             if (angular.isDefined($scope.searchField.distance) && $scope.searchField.distance !== "") {
-                url += paramCombiner+"fq=%7B!geofilt%20sfield=Location%7D&pt=" + $scope.searchField.lat + "," + $scope.searchField.long +
-                    "&d=" + $scope.searchField.distance;
+            	url += paramCombiner+'lat='+$scope.searchField.lat;
+            	paramCombiner = "&";
+            	url += paramCombiner+'long='+$scope.searchField.long;
+            	url += paramCombiner+'distance='+$scope.searchField.distance;
+            		
             }
+//            if (angular.isDefined($scope.searchField.distance) && $scope.searchField.distance !== "") {
+//                url += paramCombiner+"fq=%7B!geofilt%20sfield=Location%7D&pt=" + $scope.searchField.lat + "," + $scope.searchField.long +
+//                    "&d=" + $scope.searchField.distance;
+//            }
 
 			$http.get(url).success(function (data) {
 
